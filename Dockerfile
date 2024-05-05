@@ -1,8 +1,7 @@
 FROM ubuntu:22.04 as base
 
 RUN apt update && \
-    apt-get install -y software-properties-common && \
-    add-apt-repository -y ppa:deadsnakes/ppa
+    apt-get install -y software-properties-common
 
 RUN apt-get update -y && \
     apt-get install -y \
@@ -41,7 +40,7 @@ COPY . .
 
 # update pip & install
 ARG GITHUB_TOKEN
-RUN pip install --upgrade pip && pip install -r requirements.txt --ignore-installed # don't try to uninstall existing packages, e.g., blinker
+RUN pip install --upgrade pip && pip install -e . --ignore-installed
 
 # set entry point
 ENV PYTHONPATH=.

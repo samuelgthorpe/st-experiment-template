@@ -74,7 +74,7 @@ setuptools.setup(
     description=f"Repository housing {repo_name} tools",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url=f"https://github.com/sam-thorpe/{repo_name}",
+    url=f"https://github.com/samuelgthorpe/{repo_name}",
     classifiers=["Programming Language :: Python :: 3",
                  "Operating System :: OS Independent"],
     packages=[package_name],
