@@ -17,7 +17,7 @@ Written by Samuel Thorpe
 from logging import getLogger
 import numpy as np
 from st_experiment_template.experiment import Block
-from st_experiment_template.utils import try_catch_log
+from sampy.utils import try_catch_log
 
 
 # # Globals

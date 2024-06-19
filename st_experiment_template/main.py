@@ -11,7 +11,8 @@ Written by Samuel Thorpe
 
 # # Imports
 # -----------------------------------------------------|
-from st_experiment_template.utils.logger import init_log
+from sampy.utils.logger import init_log
+from st_experiment_template import BASE_DIR
 from st_experiment_template.experiment import Experiment
 
 
@@ -19,7 +20,7 @@ from st_experiment_template.experiment import Experiment
 # -----------------------------------------------------|
 def main(cfg_file, **kwrgs):
     """Run main method."""
-    init_log()
+    init_log(BASE_DIR)
     exp = Experiment(cfg_file, **kwrgs)
     exp.run()
 

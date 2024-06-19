@@ -15,7 +15,7 @@ import os
 import importlib
 from logging import getLogger
 from st_experiment_template import BASE_DIR
-from st_experiment_template.utils import load_yaml, try_catch_log
+from sampy.utils import load_yaml, try_catch_log
 
 
 # # Globals
