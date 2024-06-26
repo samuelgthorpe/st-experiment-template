@@ -57,6 +57,7 @@ class Experiment:
 
     # # Run Entry
     # -----------------------------------------------------|
+    @try_catch_fail(verbose=True)
     def run(self):
         """Run the experiment."""
         logger.info('running experiment')
