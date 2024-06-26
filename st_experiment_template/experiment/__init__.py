@@ -15,12 +15,12 @@ import os
 import importlib
 from logging import getLogger
 from st_experiment_template import BASE_DIR
-from sampy.utils import load_yaml, try_catch_log
+from sampy.utils import load_yaml
+from st_experiment_template import try_catch_fail
 
 
 # # Globals
 # -----------------------------------------------------|
-ExperimentException = type('ExperimentException', (Exception,), {})
 run_dir = os.path.join(BASE_DIR, 'run')
 logger = getLogger(__name__)
 
@@ -40,6 +40,7 @@ class Experiment:
             **kwrgs
         """
         logger.info('initializing experiment')
+        self.exc = type(f'{self.__class__.__name__}Exception', (Exception,), {}) 
         self.cfg = load_yaml(cfg_file)
         self.src = self._build()
         self.data = {}
@@ -56,7 +57,6 @@ class Experiment:
 
     # # Run Entry
     # -----------------------------------------------------|
-    @try_catch_log(ExperimentException)
     def run(self):
         """Run the experiment."""
         logger.info('running experiment')
@@ -64,6 +64,10 @@ class Experiment:
         for block_idx, (block_obj, params) in enumerate(self.src):
             self.blocks[block_idx] = block_obj(**params)
             self.blocks[block_idx].run()
+
+    def fail(self, msg):
+        """Raise custom class exception on failure."""
+        raise self.exc(msg)
 
 
 # # Experiment Block Base Class
@@ -77,10 +81,18 @@ class Block:
         Args:
             **params: Dict of params set in config
         """
+        self.exc = type(f'{self.__class__.__name__}Exception', (Exception,), {}) 
+
+        # make out_dir and attach params
         os.makedirs(self._out_dir, exist_ok=True)
         for key, val in params.items():
             setattr(self, f'_{key}', val)
 
+    @try_catch_fail()
     def run(self):
         """Overwrite run method."""
         pass
+
+    def fail(self, msg):
+        """Raise custom class exception on failure."""
+        raise self.exc(msg)

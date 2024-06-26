@@ -22,8 +22,7 @@ import os
 from logging import getLogger
 import matplotlib.pyplot as plt
 from st_experiment_template.experiment import Block
-from sampy.utils import try_catch_log
-from st_experiment_template.experiment.vis import VisException
+from st_experiment_template import try_catch_fail
 
 
 # # Globals
@@ -42,7 +41,7 @@ class ExampleVisBlock(Block):
         super().__init__(**params)
         os.makedirs(self._out_dir, exist_ok=True)
 
-    @try_catch_log(VisException)
+    @try_catch_fail()
     def run(self):
         """Run main method."""
         logger.info(f'running {self.__class__.__name__}')

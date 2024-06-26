@@ -17,12 +17,11 @@ Written by Samuel Thorpe
 from logging import getLogger
 import numpy as np
 from st_experiment_template.experiment import Block
-from sampy.utils import try_catch_log
+from st_experiment_template import try_catch_fail
 
 
 # # Globals
 # -----------------------------------------------------|
-ExampleBlockException = type('ExampleBlockException', (Exception,), {})
 logger = getLogger(__name__)
 
 
@@ -40,7 +39,7 @@ class ExampleBlock1(Block):
         logger.info(f'initializing {self.__class__.__name__}')
         super().__init__(**params)
 
-    @try_catch_log(ExampleBlockException)
+    @try_catch_fail()
     def run(self):
         """Run main method.
 
@@ -67,7 +66,7 @@ class ExampleBlock2(Block):
         logger.info(f'initializing {self.__class__.__name__}')
         super().__init__(**params)
 
-    @try_catch_log(ExampleBlockException)
+    @try_catch_fail()
     def run(self):
         """Run main method."""
         logger.info(f'running {self.__class__.__name__}')
