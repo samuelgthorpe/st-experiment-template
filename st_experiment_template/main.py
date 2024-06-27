@@ -11,6 +11,7 @@ Written by Samuel Thorpe
 
 # # Imports
 # -----------------------------------------------------|
+import argparse
 from sampy.utils.logger import init_log
 from st_experiment_template import BASE_DIR
 from st_experiment_template.experiment import Experiment
@@ -30,4 +31,11 @@ def main(cfg_file, **kwrgs):
 # # Main Entry
 # -----------------------------------------------------|
 if __name__ == "__main__":  # pragma: no cover
-    exp = main("st_experiment_template/cfg.yaml")
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-cfg',
+        type=str,
+        help='path to experiment cfg',
+        default="st_experiment_template/cfg.yaml")
+    args = parser.parse_args()
+    exp = main(args.cfg)
