@@ -41,4 +41,3 @@ class DevBlock(Block):
 
         from sampy.common import keyboard
         keyboard(locals(), globals())
-

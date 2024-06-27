@@ -34,9 +34,15 @@ docker.run.local:
 		${PROJECT_NAME} ${MODULE_NAME}/main.py
 
 # locally run the primary entry point for testing outside of the container
-# EXAMPLE USAGE: make run.local item_id=1
+# EXAMPLE USAGE: make run.local
 run.local:
 	@python ${MODULE_NAME}/main.py
+
+# locally run the demo experiment
+# EXAMPLE USAGE: make run.demo
+demo_cfg=${MODULE_NAME}/experiment/demo/demo.yaml
+run.demo:
+	@python ${MODULE_NAME}/main.py -cfg $(demo_cfg)
 
 # locally run unit tests
 # USAGE: make unit.test
