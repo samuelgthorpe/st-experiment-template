@@ -12,11 +12,6 @@ Written by Samuel Thorpe
 # -----------------------------------------------------|
 from logging import getLogger
 from st_experiment_template.experiment import Block
-from st_experiment_template import try_catch_fail
-
-
-# # Globals
-# -----------------------------------------------------|
 logger = getLogger(__name__)
 
 
@@ -33,7 +28,6 @@ class DevBlock(Block):
         """
         super().__init__(**params)
 
-    @try_catch_fail()
     def run(self):
         """Run main method."""
         logger.info(f'running {self.__class__.__name__}')
