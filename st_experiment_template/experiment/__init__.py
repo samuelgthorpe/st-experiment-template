@@ -40,7 +40,7 @@ class Experiment:
             **kwrgs
         """
         logger.info('initializing experiment')
-        self.exc = type(f'{self.__class__.__name__}Exception', (Exception,), {}) 
+        self.exc = type(f'{self.__class__.__name__}Exc', (Exception,), {})
         self.cfg = load_yaml(cfg_file)
         self.src = self._build()
         self.data = {}
@@ -82,7 +82,8 @@ class Block:
         Args:
             **params: Dict of params set in config
         """
-        self.exc = type(f'{self.__class__.__name__}Exception', (Exception,), {}) 
+        logger.info(f'initializing {self.__class__.__name__}')
+        self.exc = type(f'{self.__class__.__name__}Exc', (Exception,), {})
 
         # make out_dir and attach params
         os.makedirs(self._out_dir, exist_ok=True)

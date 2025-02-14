@@ -26,7 +26,7 @@ BASE_DIR = dirname(dirname(__file__))
 def try_catch_fail(*dec_args, **dec_kwrgs):
     """Wrap a class instance method in a try, catch, fail, log statement.
 
-    Note: it is assumed the first argument is self, i.e. class instance, 
+    Note: it is assumed the first argument is self, i.e. class instance,
     AND that self has a fail method, e.g. Experiment or Block
 
     Args:
@@ -54,7 +54,7 @@ def try_catch_fail(*dec_args, **dec_kwrgs):
                 return outputs
             except Exception as err:  # pylint: disable=broad-except
                 logger.error(traceback.format_exception(err))
-                args[0].fail(err)
+                raise err
 
         return wrap_method
     return _try_catch_log_decorator

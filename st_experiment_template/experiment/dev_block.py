@@ -31,7 +31,6 @@ class DevBlock(Block):
         Args:
             **params: Dict of params set in config
         """
-        logger.info(f'initializing {self.__class__.__name__}')
         super().__init__(**params)
 
     @try_catch_fail()
