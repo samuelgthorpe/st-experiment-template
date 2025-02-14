@@ -17,11 +17,6 @@ from logging import getLogger
 from st_experiment_template import BASE_DIR
 from sampy.utils import load_yaml
 from st_experiment_template import try_catch_fail
-
-
-# # Globals
-# -----------------------------------------------------|
-run_dir = os.path.join(BASE_DIR, 'run')
 logger = getLogger(__name__)
 
 
@@ -30,7 +25,7 @@ logger = getLogger(__name__)
 class Experiment:
     """Class to run basic blocked DS experiment."""
 
-    out_dir = os.path.join(run_dir, 'batch')
+    out_dir = os.path.join(BASE_DIR, 'run', 'batch')
 
     def __init__(self, cfg_file: str, **kwrgs):
         """Initialize class.
@@ -40,7 +35,7 @@ class Experiment:
             **kwrgs
         """
         logger.info('initializing experiment')
-        self.exc = type(f'{self.__class__.__name__}Exc', (Exception,), {})
+        self.exc = type(f'{self.__class__.__name__}Error', (Exception,), {})
         self.cfg = load_yaml(cfg_file)
         self.src = self._build()
         self.data = {}
@@ -83,7 +78,7 @@ class Block:
             **params: Dict of params set in config
         """
         logger.info(f'initializing {self.__class__.__name__}')
-        self.exc = type(f'{self.__class__.__name__}Exc', (Exception,), {})
+        self.exc = type(f'{self.__class__.__name__}Error', (Exception,), {})
 
         # make out_dir and attach params
         os.makedirs(self._out_dir, exist_ok=True)
