@@ -45,6 +45,7 @@ class Experiment:
         logger.info('initializing experiment')
         self.exc = type(f'{self.__class__.__name__}Error', (Exception,), {})
         self.cfg = load_yaml(cfg_file)
+        self.params = self.cfg.pop('ExperimentParams', {})
         self.src = self._build()
         self.data = {}
         self.blocks = {}
@@ -65,9 +66,18 @@ class Experiment:
         """Run the experiment."""
         logger.info('running experiment')
 
+        # run experiment
         for block_idx, (block_obj, params) in enumerate(self.src):
             self.blocks[block_idx] = block_obj(**params)
             self.blocks[block_idx].run()
+
+        # check report
+        if self.params.get('report', False):
+            self._report()
+
+        # check push
+        if self.params.get('push', False):
+            self._push()
 
     def fail(self, msg):
         """Raise custom class exception on failure."""
@@ -75,15 +85,13 @@ class Experiment:
 
     # # Report & Push Helpers
     # -----------------------------------------------------|
-    @log_exceptions()
-    def report(self):
+    def _report(self):
         """Create experiment report."""
-        logger.info('creating report')
+        logger.info('creating report: Not yet implemented')
 
-    @log_exceptions()
-    def push(self, msg):
+    def _push(self, msg):
         """Push experiment outputs as configured."""
-        logger.info('pushing experiment outputs')
+        logger.info('pushing experiment: Not yet implemented')
 
 
 # # Experiment Block Base Class
