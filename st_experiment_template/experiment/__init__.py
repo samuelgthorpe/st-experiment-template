@@ -47,8 +47,9 @@ class Experiment:
         self.cfg = load_yaml(cfg_file)
         self.params = self.cfg.pop('ExperimentParams', {})
         self.src = self._build()
-        self.data = {}
         self.blocks = {}
+        self.data = {}
+        self.report_items = []
 
     def _build(self):
         """Build experiment from cfg."""
@@ -56,6 +57,7 @@ class Experiment:
             block_src = importlib.import_module(block_params['module'])
             block_obj = getattr(block_src, cls_name)
             block_obj._exp_data = self.data
+            block_obj._report_items = self.report_items
             block_obj._out_dir = f'{self.out_dir}/{block_idx}-{cls_name}'
             yield (block_obj, block_params)
 
@@ -63,35 +65,33 @@ class Experiment:
     # -----------------------------------------------------|
     @log_exceptions()
     def run(self):
-        """Run the experiment."""
+        """Run the experiment & report/push if specified"""
         logger.info('running experiment')
-
-        # run experiment
         for block_idx, (block_obj, params) in enumerate(self.src):
             self.blocks[block_idx] = block_obj(**params)
             self.blocks[block_idx].run()
 
-        # check report
-        if self.params.get('report', False):
-            self._report()
+        # check configurable experiment params
+        for param in ['report', 'push']:
+            params = self.params.get(param, {})
+            if params:
+                getattr(self, f'_{param}')(**params)
 
-        # check push
-        if self.params.get('push', False):
-            self._push()
-
-    def fail(self, msg):
-        """Raise custom class exception on failure."""
-        raise self.exc(msg)
-
-    # # Report & Push Helpers
+    # # Configurable experiment param helpers
     # -----------------------------------------------------|
-    def _report(self):
+    def _report(self, report_params):
         """Create experiment report."""
         logger.info('creating report: Not yet implemented')
+        # tmp outline
+        # from st_experiment_template.report import Report
+        # report = Report(report_params, self.report_items)
+        # report.export()
 
     def _push(self, msg):
         """Push experiment outputs as configured."""
         logger.info('pushing experiment: Not yet implemented')
+        # tmp outline
+        # add code to push experiment outputs to remote location
 
 
 # # Experiment Block Base Class
