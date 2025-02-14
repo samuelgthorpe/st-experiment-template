@@ -73,6 +73,18 @@ class Experiment:
         """Raise custom class exception on failure."""
         raise self.exc(msg)
 
+    # # Report & Push Helpers
+    # -----------------------------------------------------|
+    @log_exceptions()
+    def report(self):
+        """Create experiment report."""
+        logger.info('creating report')
+
+    @log_exceptions()
+    def push(self, msg):
+        """Push experiment outputs as configured."""
+        logger.info('pushing experiment outputs')
+
 
 # # Experiment Block Base Class
 # -----------------------------------------------------|
