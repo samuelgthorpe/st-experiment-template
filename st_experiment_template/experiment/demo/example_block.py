@@ -48,5 +48,3 @@ class ExampleBlock2(Block):
         self._exp_data['x'] = np.cos(self._exp_data['theta'] - np.pi/2)
         self._exp_data['y'] = np.sin(self._exp_data['theta'] - np.pi/2)
         self._exp_data['z'] = self._exp_data['theta']
-
-        self.fail("testing error!")
