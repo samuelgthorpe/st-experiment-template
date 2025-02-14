@@ -14,10 +14,17 @@ Written by Samuel Thorpe
 import os
 import importlib
 from logging import getLogger
-from st_experiment_template import BASE_DIR
+from functools import partial
+import dill
 from sampy.utils import load_yaml
-from st_experiment_template import try_catch_fail
+from sampy.utils.logger import log_exceptions
+from st_experiment_template import BASE_DIR
+
+
+# # Globals
+# -----------------------------------------------------|
 logger = getLogger(__name__)
+log_exceptions = partial(log_exceptions, logger=logger)
 
 
 # # Primary Class
@@ -27,6 +34,7 @@ class Experiment:
 
     out_dir = os.path.join(BASE_DIR, 'run', 'batch')
 
+    @log_exceptions()
     def __init__(self, cfg_file: str, **kwrgs):
         """Initialize class.
 
@@ -52,7 +60,7 @@ class Experiment:
 
     # # Run Entry
     # -----------------------------------------------------|
-    @try_catch_fail(verbose=True)
+    @log_exceptions()
     def run(self):
         """Run the experiment."""
         logger.info('running experiment')
@@ -64,6 +72,18 @@ class Experiment:
     def fail(self, msg):
         """Raise custom class exception on failure."""
         raise self.exc(msg)
+
+    # # Report & Push Helpers
+    # -----------------------------------------------------|
+    @log_exceptions()
+    def report(self):
+        """Create experiment report."""
+        logger.info('creating report')
+
+    @log_exceptions()
+    def push(self, msg):
+        """Push experiment outputs as configured."""
+        logger.info('pushing experiment outputs')
 
 
 # # Experiment Block Base Class
@@ -85,7 +105,6 @@ class Block:
         for key, val in params.items():
             setattr(self, f'_{key}', val)
 
-    @try_catch_fail()
     def run(self):
         """Overwrite run method."""
         pass
@@ -93,3 +112,47 @@ class Block:
     def fail(self, msg):
         """Raise custom class exception on failure."""
         raise self.exc(msg)
+
+    @staticmethod
+    def _cache(dat, file_name):
+        """Save pickled binary file."""
+        logger.info(f'saving {file_name}')
+        with open(file_name, 'wb') as pkl:
+            dill.dump(dat, pkl)
+
+    @staticmethod
+    def _load(file_name):
+        """Load pickled binary file."""
+        logger.info(f'loading {file_name}')
+        with open(file_name, 'rb') as pkl:
+            return dill.load(pkl)
+
+    @staticmethod
+    def _import(full_class_name):
+        """Import class from pip installed Python libraries."""
+        logger.info(f'importing {full_class_name}')
+        module_name, class_name = full_class_name.rsplit(".", 1)
+        module = importlib.import_module(module_name)
+        return getattr(module, class_name)
+
+
+# # CheckRunBlock Base Class
+# -----------------------------------------------------|
+class CheckRunBlock(Block):
+    """Initialize class."""
+
+    out_fn = None
+
+    def run(self):
+        """Run main method."""
+        out_pth = f'{self._out_dir}/{self.out_fn}.pkl'
+        if os.path.exists(out_pth) and self._recompile is False:
+            self._exp_data[self.out_fn] = self._load(out_pth)
+        else:
+            logger.info(f'generating {self.out_fn}')
+            self._exp_data[self.out_fn] = self._run()
+            self._cache(self._exp_data[self.out_fn], out_pth)
+
+    def _run(self):
+        """Overwrite this run method."""
+        pass

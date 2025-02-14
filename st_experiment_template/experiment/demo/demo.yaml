@@ -1,4 +1,7 @@
 # defines block experiment to run in the configured order
+ExperimentParams:
+  report: True
+  push: False
 
 ExampleBlock1:
   module: st_experiment_template.experiment.demo.example_block
