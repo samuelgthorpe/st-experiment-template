@@ -84,7 +84,7 @@ class Experiment:
         logger.info('creating report: Not yet implemented')
         # tmp outline
         # from st_experiment_template.report import Report
-        # report = Report(report_params, self.report_items)
+        # report = Report(self.report_items, **report_params)
         # report.export()
 
     def _push(self, msg):
