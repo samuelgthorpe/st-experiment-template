@@ -1,6 +1,12 @@
 # defines block experiment to run in the configured order
 ExperimentParams:
-  report: True
+  report:
+    title: Demo Experiment
+    tagline: A simple experiment to demonstrate the experiment template
+    description: >
+      This is a simple experiment to demonstrate the experiment template.
+      It consists of two example blocks and one example visualization block.
+      The example visualization block generates a simple visualization.
   push: False
 
 ExampleBlock1:

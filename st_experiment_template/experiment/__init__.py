@@ -19,6 +19,7 @@ import dill
 from sampy.utils import load_yaml
 from sampy.utils.logger import log_exceptions
 from st_experiment_template import BASE_DIR
+from st_experiment_template.experiment.report import Report
 
 
 # # Globals
@@ -73,25 +74,23 @@ class Experiment:
 
         # check configurable experiment params
         for param in ['report', 'push']:
-            params = self.params.get(param, {})
+            params = self.params.get(param)
             if params:
-                getattr(self, f'_{param}')(**params)
+                params = {} if params is True else params
+                getattr(self, f'_{param}')(params)
 
     # # Configurable experiment param helpers
     # -----------------------------------------------------|
     def _report(self, report_params):
         """Create experiment report."""
-        logger.info('creating report: Not yet implemented')
-        # tmp outline
-        # from st_experiment_template.report import Report
-        # report = Report(self.report_items, **report_params)
-        # report.export()
+        logger.info('creating report')
+        report = Report(self.report_items, **report_params)
+        report.export()
 
     def _push(self, msg):
         """Push experiment outputs as configured."""
         logger.info('pushing experiment: Not yet implemented')
-        # tmp outline
-        # add code to push experiment outputs to remote location
+        # TODO: add code to push experiment outputs to remote location
 
 
 # # Experiment Block Base Class

@@ -7,9 +7,6 @@ architecture is intended to be whatever it needs to be.
 
 # NOTES
 # ----------------------------------------------------------------------------|
-Example data/visualization taken from:
-https://matplotlib.org/stable/gallery/mplot3d/
-stem3d_demo.html#sphx-glr-gallery-mplot3d-stem3d-demo-py
 
 
 Written by Samuel Thorpe
@@ -22,6 +19,7 @@ import os
 from logging import getLogger
 import matplotlib.pyplot as plt
 from st_experiment_template.experiment import Block
+from st_experiment_template.experiment.report import report_img
 logger = getLogger(__name__)
 
 
@@ -29,6 +27,10 @@ logger = getLogger(__name__)
 # -----------------------------------------------------|
 class ExampleVisBlock(Block):
     """Example experiment visualization block class."""
+
+    desc = '''Example data/visualization taken from:
+        https://matplotlib.org/stable/gallery/mplot3d/
+        stem3d_demo.html#sphx-glr-gallery-mplot3d-stem3d-demo-py'''
 
     def run(self):
         """Run main method."""
@@ -41,3 +43,6 @@ class ExampleVisBlock(Block):
         fig.savefig(vis_fn)
         plt.close(fig)
         logger.info(f'saved {vis_fn}')
+
+        # add to report
+        self._report_items.append(report_img(vis_fn, desc=self.desc))
