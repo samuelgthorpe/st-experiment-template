@@ -36,7 +36,7 @@ class ExampleVisBlock(Block):
 
     def run(self):
         """Run main method."""
-        if self._plot_library != 'plotly':
+        if self.params.get('plot_library') != 'plotly':
             self._vis_with_matplotlib()
         else:
             self._vis_with_plotly()
@@ -93,7 +93,7 @@ class ExampleVisBlock(Block):
         )
 
         # add to report
-        html_str = fig.to_html(full_html=False, include_plotlyjs="cdn")
+        html_str = fig.to_html(full_html=False, include_plotlyjs="inline")
         self._report_items.append(
             report_code_html(html_str, hdr='3D Stem Plot', desc=self.desc)
         )

@@ -106,6 +106,7 @@ class Block:
         """
         logger.info(f'initializing {self.__class__.__name__}')
         self.exc = type(f'{self.__class__.__name__}Error', (Exception,), {})
+        self.params = params
 
         # make out_dir and attach params
         os.makedirs(self._out_dir, exist_ok=True)
