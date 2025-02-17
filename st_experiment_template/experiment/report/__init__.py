@@ -62,14 +62,14 @@ class Report():
     def _add_item(report, item):
         """Add new cells for the report item."""
         report['cells'].append(report_cell(
-            source=[f'<h2>{item["hdr"]}</h2>', '\n\n', '---', '\n']
+            source=[
+                f'<h2>{item["hdr"]}</h2>', '\n\n', '---', '\n',
+                f'\n<i>Item Description:</i> {item['desc']}\n'
+                ]
         ))
         report['cells'].append(report_cell(
             cell_type=item['type'],
-            source=[
-                f'\n<i>Item Description:</i> {item['desc']}\n',
-                f'{item['content']}\n'
-            ]
+            source=[item['content']]
         ))
 
     def export(self):
@@ -84,14 +84,19 @@ class Report():
         report_pth = join(report_dir, f'{self.report_fn}.ipynb')
         with open(report_pth, "w") as fh:
             json.dump(self.report, fh, indent=4)
-        call(['jupyter', 'nbconvert', '--to', 'html', report_pth])
+        call(['jupyter', 'nbconvert', '--execute', '--to', 'html', report_pth])
 
 
 # # Report building helpers
 # -----------------------------------------------------|
-def report_cell(source=[], metadata={}, cell_type='markdown'):
+def report_cell(source=[], metadata={}, outputs=[], cell_type='markdown'):
     """Return report cell with specified fields."""
-    return dict(source=source, cell_type=cell_type, metadata=metadata)
+    cell = dict(source=source, cell_type=cell_type, metadata=metadata)
+    if cell_type == 'code':
+        cell['outputs'] = outputs
+        cell['execution_count'] = 0
+
+    return cell
 
 
 def report_item(hdr=None, desc=None, content=None, type='markdown'):
@@ -110,6 +115,11 @@ def report_table(dfr, hdr='Table', desc='insert description'):
     return report_item(hdr, desc, content=table_html)
 
 
-def report_html(content, hdr='Figure', desc='insert description'):
+def report_code_html(html_str, hdr='Figure', desc='insert description'):
     """Structure html figure as report item."""
-    return report_item(hdr, desc, content, type='raw')
+    content = f"""
+    from IPython.display import display, HTML
+    html_str = '''{html_str}'''
+    display(HTML(html_str))
+    """
+    return report_item(hdr, desc, content, type='code')

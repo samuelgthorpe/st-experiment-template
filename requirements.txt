@@ -1,5 +1,6 @@
 gitPython
 matplotlib
+plotly
 boto3
 psutil
 PyYAML

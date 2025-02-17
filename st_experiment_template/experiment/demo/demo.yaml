@@ -17,3 +17,4 @@ ExampleBlock2:
 
 ExampleVisBlock:
   module: st_experiment_template.experiment.demo.example_vis_block
+  plot_library: plotly

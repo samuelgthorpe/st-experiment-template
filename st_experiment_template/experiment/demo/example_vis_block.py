@@ -18,8 +18,10 @@ Written by Samuel Thorpe
 import os
 from logging import getLogger
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 from st_experiment_template.experiment import Block
 from st_experiment_template.experiment.report import report_img
+from st_experiment_template.experiment.report import report_code_html
 logger = getLogger(__name__)
 
 
@@ -34,6 +36,13 @@ class ExampleVisBlock(Block):
 
     def run(self):
         """Run main method."""
+        if self._plot_library != 'plotly':
+            self._vis_with_matplotlib()
+        else:
+            self._vis_with_plotly()
+
+    def _vis_with_matplotlib(self):
+        """Return standard matplotlib visualization."""
         fig, axi = plt.subplots(subplot_kw=dict(projection='3d'))
         axi.stem(self._exp_data['x'], self._exp_data['y'], self._exp_data['z'])
         axi.set_title('Example 3D Stem Plot', fontsize=15, fontstyle='italic')
@@ -45,4 +54,46 @@ class ExampleVisBlock(Block):
         logger.info(f'saved {vis_fn}')
 
         # add to report
-        self._report_items.append(report_img(vis_fn, desc=self.desc))
+        self._report_items.append(
+            report_img(vis_fn, hdr='3D Stem Plot', desc=self.desc)
+        )
+
+    def _vis_with_plotly(self):
+        """Return plotly visualization."""
+        x, y, z = self._exp_data['x'], self._exp_data['y'], self._exp_data['z']
+        lines = [
+            go.Scatter3d(
+                x=[x[i], x[i]],  # Same x value
+                y=[y[i], y[i]],  # Same y value
+                z=[0, z[i]],     # Line from z=0 to z[i]
+                mode="lines",
+                line=dict(color="black", width=2),
+                showlegend=False
+            )
+            for i in range(len(x))
+        ]
+
+        # Add marker points on top
+        points = go.Scatter3d(
+            x=x, y=y, z=z,
+            mode="markers",
+            marker=dict(size=6, color="red"),
+            name="Data Points"
+        )
+
+        # Combine traces and layout
+        fig = go.Figure(data=lines + [points])
+        fig.update_layout(
+            title="Example 3D Stem Plot",
+            scene=dict(
+                xaxis_title="X Axis",
+                yaxis_title="Y Axis",
+                zaxis_title="Z Axis"
+            )
+        )
+
+        # add to report
+        html_str = fig.to_html(full_html=False, include_plotlyjs="cdn")
+        self._report_items.append(
+            report_code_html(html_str, hdr='3D Stem Plot', desc=self.desc)
+        )
