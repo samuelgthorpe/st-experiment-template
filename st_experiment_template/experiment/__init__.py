@@ -11,13 +11,16 @@ Written by Samuel Thorpe
 
 # # Imports
 # -----------------------------------------------------|
-import os
-import importlib
 from logging import getLogger
+import os
+from os.path import join
+import importlib
 from functools import partial
+from datetime import datetime
 import dill
 from sampy.utils import load_yaml
 from sampy.utils.logger import log_exceptions
+from sampy.utils.aws_s3 import AwsS3
 from st_experiment_template import BASE_DIR
 from st_experiment_template.experiment.report import Report
 
@@ -87,10 +90,19 @@ class Experiment:
         report = Report(self.report_items, **report_params)
         report.export()
 
-    def _push(self, msg):
+    def _push(self, push_params):
         """Push experiment outputs as configured."""
-        logger.info('pushing experiment: Not yet implemented')
-        # TODO: add code to push experiment outputs to remote location
+        logger.info('pushing experiment')
+        _now_ = datetime.now().strftime('%Y%m%d-%H%M%S')
+        cfg_prefix = push_params.get('prefix', '')
+        prefix = join(cfg_prefix, BASE_DIR, f'run-{_now_}')
+
+        s3 = AwsS3()
+        s3.upload_folder_to_s3(
+            local_dir='run',
+            bucket_name=push_params['bucket'],
+            prefix=prefix
+        )
 
 
 # # Experiment Block Base Class

@@ -19,8 +19,9 @@ import os
 from logging import getLogger
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+import plotly.io as pio
 from st_experiment_template.experiment import Block
-from st_experiment_template.experiment.report import report_img
+from st_experiment_template.experiment.report import report_img_code
 from st_experiment_template.experiment.report import report_code_html
 logger = getLogger(__name__)
 
@@ -55,7 +56,7 @@ class ExampleVisBlock(Block):
 
         # add to report
         self._report_items.append(
-            report_img(vis_fn, hdr='3D Stem Plot', desc=self.desc)
+            report_img_code(vis_fn, hdr='3D Stem Plot', desc=self.desc)
         )
 
     def _vis_with_plotly(self):
@@ -93,7 +94,7 @@ class ExampleVisBlock(Block):
         )
 
         # add to report
-        html_str = fig.to_html(full_html=False, include_plotlyjs="inline")
+        html_str = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
         self._report_items.append(
             report_code_html(html_str, hdr='3D Stem Plot', desc=self.desc)
         )

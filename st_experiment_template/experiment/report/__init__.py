@@ -1,7 +1,5 @@
 """
-Insert New description. The old pyweave stuff got trashed so I am going with a
-way low-tech solution for building these reports that seems pretty robust
-
+Insert New description.
 
 # NOTES
 # ----------------------------------------------------------------------------|
@@ -24,6 +22,18 @@ from st_experiment_template import BASE_DIR
 # -----------------------------------------------------|
 REPORT_DIR = join('run', 'report')
 REPORT_TEMPLATE = join(dirname(__file__), 'report_template.ipynb')
+CSS_STYLE_CODE = '''
+from IPython.display import HTML, display
+display(HTML("""
+<style>
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+</style>
+"""))
+'''.strip()
 
 
 # # Main Report Class for Inheritance
@@ -42,6 +52,7 @@ class Report():
     def _build_report(self, report_items):
         """Compile report: update template & add items."""
         report = self._update_template()
+        report = self._prepend_style_cell(report)
         for item in report_items:
             self._add_item(report, item)
 
@@ -58,18 +69,28 @@ class Report():
 
         return report
 
+    def _prepend_style_cell(self, report):
+        """Prepend the CSS style code block."""
+        src = CSS_STYLE_CODE
+        meta = {"tags": ["hide_input"]}
+        style_cell = report_cell(source=src, metadata=meta, cell_type='code')
+        report['cells'].insert(0, style_cell)
+
+        return report
+
     @staticmethod
     def _add_item(report, item):
         """Add new cells for the report item."""
         report['cells'].append(report_cell(
             source=[
                 f'<h2>{item["hdr"]}</h2>', '\n\n', '---', '\n',
-                f'\n<i>Item Description:</i> {item['desc']}\n'
+                f'\n<i>Item Description:</i> {item["desc"]}\n'
                 ]
         ))
         report['cells'].append(report_cell(
             cell_type=item['type'],
-            source=[item['content']]
+            source=[item['content']],
+            metadata=item['meta']
         ))
 
     def export(self):
@@ -80,11 +101,21 @@ class Report():
 
         report_dir = join(REPORT_DIR, self.report_fn)
         os.makedirs(report_dir, exist_ok=True)
-
         report_pth = join(report_dir, f'{self.report_fn}.ipynb')
         with open(report_pth, "w") as fh:
             json.dump(self.report, fh, indent=4)
-        call(['jupyter', 'nbconvert', '--execute', '--to', 'html', report_pth])
+        cmd = [
+            'jupyter',
+            'nbconvert',
+            '--execute',
+            '--TagRemovePreprocessor.enabled=True',
+            '--TagRemovePreprocessor.remove_input_tags=["hide_input"]',
+            '--to',
+            'html',
+            '--no-input',
+            report_pth
+        ]
+        call(cmd)
 
 
 # # Report building helpers
@@ -99,20 +130,45 @@ def report_cell(source=[], metadata={}, outputs=[], cell_type='markdown'):
     return cell
 
 
-def report_item(hdr=None, desc=None, content=None, type='markdown'):
+def report_item(hdr=None, desc=None, content=None, meta={}, type='markdown'):
     """Return report item default cell."""
-    return dict(hdr=hdr, desc=desc, content=content, type=type)
+    return dict(hdr=hdr, desc=desc, content=content, meta=meta, type=type)
 
 
 def report_img(pth, hdr='Figure', desc='insert description'):
     """Structure saved image as report item."""
-    return report_item(hdr, desc, f'<div><img hr align=left src={pth}></div>')
+    if isinstance(pth, str):
+        content = f'<div><img align="left" src="{pth}"></div>'
+    elif isinstance(pth, list):
+        content = [f'<div><img align="left" src="{x}"></div>' for x in pth]
+        content = '\n'.join(content)
+    else:
+        content = pth
+
+    return report_item(hdr, desc, content)
 
 
 def report_table(dfr, hdr='Table', desc='insert description'):
     """Structure dataframe table as report item."""
     table_html = dfr.to_html(index=True, float_format='{:.2f}'.format)
     return report_item(hdr, desc, content=table_html)
+
+
+def report_img_code(pths, hdr='Figure', desc='insert description'):
+    """Structure html figure as report item."""
+    content = ["from IPython.display import Image, display"]
+    meta = {"tags": ["hide_input"]}
+    if isinstance(pths, str):
+        pths = [pths]
+    elif not isinstance(pths, list):
+        raise Exception('must pass img path as string or list of strings!')
+
+    # loop construct content
+    for pth in pths:
+        content.append(f'display(Image("{pth}"))')
+    content = "\n".join(content)
+
+    return report_item(hdr, desc, content, meta=meta, type='code')
 
 
 def report_code_html(html_str, hdr='Figure', desc='insert description'):
