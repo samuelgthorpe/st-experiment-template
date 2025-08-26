@@ -60,7 +60,7 @@ class Experiment:
         for block_idx, (cls_name, block_params) in enumerate(self.cfg.items()):
             block_src = importlib.import_module(block_params['module'])
             block_obj = getattr(block_src, cls_name)
-            block_obj._exp_data = self.data
+            block_obj._data = self.data
             block_obj._report_items = self.report_items
             block_obj._out_dir = f'{self.out_dir}/{block_idx}-{cls_name}'
             yield (block_obj, block_params)

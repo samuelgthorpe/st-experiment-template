@@ -45,7 +45,7 @@ class ExampleVisBlock(Block):
     def _vis_with_matplotlib(self):
         """Return standard matplotlib visualization."""
         fig, axi = plt.subplots(subplot_kw=dict(projection='3d'))
-        axi.stem(self._exp_data['x'], self._exp_data['y'], self._exp_data['z'])
+        axi.stem(self._data['x'], self._data['y'], self._data['z'])
         axi.set_title('Example 3D Stem Plot', fontsize=15, fontstyle='italic')
 
         # save out
@@ -61,7 +61,7 @@ class ExampleVisBlock(Block):
 
     def _vis_with_plotly(self):
         """Return plotly visualization."""
-        x, y, z = self._exp_data['x'], self._exp_data['y'], self._exp_data['z']
+        x, y, z = self._data['x'], self._data['y'], self._data['z']
         lines = [
             go.Scatter3d(
                 x=[x[i], x[i]],  # Same x value

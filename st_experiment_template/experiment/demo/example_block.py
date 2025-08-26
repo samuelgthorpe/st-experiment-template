@@ -34,7 +34,7 @@ class ExampleBlock1(Block):
               to disk and load as needed in subsequent blocks.
         """
         logger.info(f'running {self.__class__.__name__}')
-        self._exp_data['theta'] = np.linspace(0, 2*np.pi)
+        self._data['theta'] = np.linspace(0, 2*np.pi)
 
 
 # # Experiment Block Example Class 2
@@ -45,6 +45,6 @@ class ExampleBlock2(Block):
     def run(self):
         """Run main method."""
         logger.info(f'running {self.__class__.__name__}')
-        self._exp_data['x'] = np.cos(self._exp_data['theta'] - np.pi/2)
-        self._exp_data['y'] = np.sin(self._exp_data['theta'] - np.pi/2)
-        self._exp_data['z'] = self._exp_data['theta']
+        self._data['x'] = np.cos(self._data['theta'] - np.pi/2)
+        self._data['y'] = np.sin(self._data['theta'] - np.pi/2)
+        self._data['z'] = self._data['theta']
