@@ -15,7 +15,7 @@ from logging import getLogger
 import os
 from os.path import join
 import importlib
-from functools import partial
+from functools import partial, lru_cache
 from datetime import datetime
 import dill
 from sampy.utils import load_yaml
@@ -133,18 +133,19 @@ class Block:
         """Raise custom class exception on failure."""
         raise self.exc(msg)
 
-    @staticmethod
-    def _cache(dat, file_name):
+    def _cache(self, dat, file_name, prefix=None):
         """Save pickled binary file."""
         logger.info(f'saving {file_name}')
-        with open(file_name, 'wb') as pkl:
+        if prefix is not None:
+            file_name = join(prefix, file_name)
+        with open(join(self._out_dir, file_name), 'wb') as pkl:
             dill.dump(dat, pkl)
 
-    @staticmethod
-    def _load(file_name):
+    @lru_cache
+    def _load(self, file_name):
         """Load pickled binary file."""
         logger.info(f'loading {file_name}')
-        with open(file_name, 'rb') as pkl:
+        with open(join(self._out_dir, file_name), 'rb') as pkl:
             return dill.load(pkl)
 
     @staticmethod
@@ -161,17 +162,32 @@ class Block:
 class CheckRunBlock(Block):
     """Initialize class."""
 
-    out_fn = None
+    outputs = {}
 
     def run(self):
         """Run main method."""
-        out_pth = f'{self._out_dir}/{self.out_fn}.pkl'
-        if os.path.exists(out_pth) and self._recompile is False:
-            self._exp_data[self.out_fn] = self._load(out_pth)
+        logger.info(f'running {self.__class__.__name__}')
+
+        if self.params.get('recompute') is True or not self._outputs_present():
+            run_outputs = self._run()
+            for key, file in self.outputs.items():
+                out_pth = f'{self._out_dir}/{file}'
+                self._cache(run_outputs[key], out_pth)
+                self._data[key] = lambda: self._load(out_pth)
+
         else:
-            logger.info(f'generating {self.out_fn}')
-            self._exp_data[self.out_fn] = self._run()
-            self._cache(self._exp_data[self.out_fn], out_pth)
+            for key, file in self.outputs.items():
+                out_pth = f'{self._out_dir}/{file}'
+                self._data[key] = lambda: self._load(out_pth)
+
+    def _outputs_present(self):
+        """Return False if any outputs are missing."""
+        for key, file in self.outputs.items():
+            out_pth = f'{self._out_dir}/{file}'
+            if not os.path.exists(out_pth):
+                return False
+
+        return True
 
     def _run(self):
         """Overwrite this run method."""
