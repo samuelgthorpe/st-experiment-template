@@ -11,7 +11,7 @@ Written by Samuel Thorpe
 # # Imports
 # -----------------------------------------------------|
 import os
-from os.path import basename, dirname, join
+from os.path import basename, dirname, join, splitext
 import json
 from datetime import datetime
 from subprocess import call
@@ -110,9 +110,10 @@ class Report():
             '--execute',
             '--TagRemovePreprocessor.enabled=True',
             '--TagRemovePreprocessor.remove_input_tags=["hide_input"]',
+            '--HTMLExporter.sanitize_html=False',
+            '--no-input',
             '--to',
             'html',
-            '--no-input',
             report_pth
         ]
         call(cmd)
@@ -154,9 +155,8 @@ def report_table(dfr, hdr='Table', desc='insert description'):
     return report_item(hdr, desc, content=table_html)
 
 
-def report_img_code(pths, hdr='Figure', desc='insert description'):
+def report_img_code(pths, hdr='Figure', desc='insert description', **params):
     """Structure html figure as report item."""
-    content = ["from IPython.display import Image, display"]
     meta = {"tags": ["hide_input"]}
     if isinstance(pths, str):
         pths = [pths]
@@ -165,7 +165,16 @@ def report_img_code(pths, hdr='Figure', desc='insert description'):
 
     # loop construct content
     for pth in pths:
-        content.append(f'display(Image("{pth}"))')
+        if splitext(pth)[-1] == '.html':
+            content = ["from IPython.display import IFrame, display"]
+            width = params.get('width', '100%')
+            height = params.get('height', 600)
+            content.append(
+                f'display(IFrame("{pth}", width="{width}", height={height}))'
+            )
+        else:
+            content = ["from IPython.display import Image, display"]
+            content.append(f'display(Image("{pth}"))')
     content = "\n".join(content)
 
     return report_item(hdr, desc, content, meta=meta, type='code')
@@ -176,6 +185,11 @@ def report_code_html(html_str, hdr='Figure', desc='insert description'):
     content = f"""
     from IPython.display import display, HTML
     html_str = '''{html_str}'''
+
     display(HTML(html_str))
     """
     return report_item(hdr, desc, content, type='code')
+
+# def report_code_html(html_str, hdr='Figure', desc='insert description'):
+#     """Structure html figure as report item."""
+#     return report_item(hdr, desc, html_str, type='markdown')

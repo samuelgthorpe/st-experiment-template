@@ -87,6 +87,7 @@ class ExampleVisBlock(Block):
         fig.update_layout(
             title="Example 3D Stem Plot",
             scene=dict(
+                aspectmode='cube',
                 xaxis_title="X Axis",
                 yaxis_title="Y Axis",
                 zaxis_title="Z Axis"
@@ -94,7 +95,8 @@ class ExampleVisBlock(Block):
         )
 
         # add to report
-        html_str = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
+        vis_fn = os.path.join(self._out_dir, 'example.html')
+        pio.write_html(fig, vis_fn, include_plotlyjs='cdn', full_html=False)
         self._report_items.append(
-            report_code_html(html_str, hdr='3D Stem Plot', desc=self.desc)
+            report_img_code(vis_fn, hdr='3D Stem Plot', desc=self.desc)
         )
