@@ -173,12 +173,12 @@ class CheckRunBlock(Block):
             for key, file in self.outputs.items():
                 out_pth = f'{self._out_dir}/{file}'
                 self._cache(run_outputs[key], out_pth)
-                self._data[key] = lambda: self._load(out_pth)
+                self._data[key] = partial(self._load, out_pth)
 
         else:
             for key, file in self.outputs.items():
                 out_pth = f'{self._out_dir}/{file}'
-                self._data[key] = lambda: self._load(out_pth)
+                self._data[key] = partial(self._load, out_pth)
 
     def _outputs_present(self):
         """Return False if any outputs are missing."""
