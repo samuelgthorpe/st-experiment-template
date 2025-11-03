@@ -189,7 +189,3 @@ def report_code_html(html_str, hdr='Figure', desc='insert description'):
     display(HTML(html_str))
     """
     return report_item(hdr, desc, content, type='code')
-
-# def report_code_html(html_str, hdr='Figure', desc='insert description'):
-#     """Structure html figure as report item."""
-#     return report_item(hdr, desc, html_str, type='markdown')
