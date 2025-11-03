@@ -142,9 +142,11 @@ class Block:
             dill.dump(dat, pkl)
 
     @lru_cache
-    def _load(self, file_name):
+    def _load(self, file_name, prefix=None):
         """Load pickled binary file."""
         logger.info(f'loading {file_name}')
+        if prefix is not None:
+            file_name = join(prefix, file_name)
         with open(join(self._out_dir, file_name), 'rb') as pkl:
             return dill.load(pkl)
 
