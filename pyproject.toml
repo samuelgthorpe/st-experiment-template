@@ -24,6 +24,7 @@ dependencies = [
     "boto3",
     "psutil",
     "pyyaml",
+    "nbconvert",
     # GitHub dependency (public, so no token needed)
     "sampy @ git+https://github.com/samuelgthorpe/sampy.git@main"
 ]

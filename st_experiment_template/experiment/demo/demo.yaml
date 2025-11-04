@@ -1,5 +1,6 @@
 # defines block experiment to run in the configured order
 ExperimentParams:
+  block_rng_seed: True
   report:
     title: Demo Experiment
     tagline: A simple experiment to demonstrate the experiment template

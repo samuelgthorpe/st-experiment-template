@@ -15,9 +15,11 @@ from logging import getLogger
 import os
 from os.path import join
 import importlib
+import hashlib
 from functools import partial, lru_cache
 from datetime import datetime
 import dill
+import numpy as np
 from sampy.utils import load_yaml
 from sampy.utils.logger import log_exceptions
 from sampy.utils.aws_s3 import AwsS3
@@ -63,7 +65,21 @@ class Experiment:
             block_obj._data = self.data
             block_obj._report_items = self.report_items
             block_obj._out_dir = f'{self.out_dir}/{block_idx}-{cls_name}'
+
+            # set rng seed if specified
+            if self.params.get('block_rng_seed') is True:
+                if 'rng_seed' not in block_params:
+                    block_params['rng_seed'] = self._get_deterministic_seed(
+                        block_params, cls_name)
+
             yield (block_obj, block_params)
+
+    def _get_deterministic_seed(self, block_params, cls_name, base_seed=8888):
+        """Return the deterministic rng seed to initialize in block."""
+        seed_str = f'{cls_name}-{block_params["module"]}-{base_seed}'
+        digest = hashlib.sha256(seed_str.encode()).digest()
+
+        return int.from_bytes(digest[:4], 'little')
 
     # # Run Entry
     # -----------------------------------------------------|
@@ -125,6 +141,10 @@ class Block:
         for key, val in params.items():
             setattr(self, f'_{key}', val)
 
+        # set rng seed if specified
+        if hasattr(self, '_rng_seed'):
+            np.random.seed(self._rng_seed)
+
     def run(self):
         """Overwrite run method."""
         pass
@@ -170,7 +190,7 @@ class CheckRunBlock(Block):
         """Run main method."""
         logger.info(f'running {self.__class__.__name__}')
 
-        if self.params.get('recompute') is True or not self._outputs_present():
+        if self._recompute is True or not self._outputs_present():
             run_outputs = self._run()
             for key, file in self.outputs.items():
                 out_pth = f'{self._out_dir}/{file}'
