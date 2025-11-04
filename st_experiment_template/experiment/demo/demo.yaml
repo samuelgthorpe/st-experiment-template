@@ -15,6 +15,7 @@ ExampleBlock1:
 
 ExampleBlock2:
   module: st_experiment_template.experiment.demo.example_block
+  recompute: True
 
 ExampleVisBlock:
   module: st_experiment_template.experiment.demo.example_vis_block

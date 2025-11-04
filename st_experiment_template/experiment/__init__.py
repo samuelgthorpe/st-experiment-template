@@ -186,21 +186,38 @@ class CheckRunBlock(Block):
 
     outputs = {}
 
-    def run(self):
-        """Run main method."""
-        logger.info(f'running {self.__class__.__name__}')
+    def __init__(self, **params):
+        """Instantiate class.
 
-        if self._recompute is True or not self._outputs_present():
-            run_outputs = self._run()
-            for key, file in self.outputs.items():
-                out_pth = f'{self._out_dir}/{file}'
-                self._cache(run_outputs[key], out_pth)
-                self._data[key] = partial(self._load, out_pth)
+        Args:
+            **params: Dict of params set in config
+        """
+        super().__init__(**params)
+        self.run = self._wrap_check_run(self.run)
 
-        else:
-            for key, file in self.outputs.items():
-                out_pth = f'{self._out_dir}/{file}'
-                self._data[key] = partial(self._load, out_pth)
+    def _wrap_check_run(self, run_method):
+        """Return wrapped run method with check/load functionality.
+
+        Note: This method looks for specified outputs in self.outputs and
+              checks if they are present in the output directory. If all
+              outputs are present and self._recompute is not True, the outputs
+              are loaded from disk. Otherwise, the original run method is
+              executed and the outputs are cached to disk.
+        """
+        def inner():
+            logger.info(f'running {self.__class__.__name__}')
+            if self._recompute is True or not self._outputs_present():
+                run_outputs = run_method()
+                for key, file in self.outputs.items():
+                    out_pth = f'{self._out_dir}/{file}'
+                    self._cache(run_outputs[key], out_pth)
+                    self._data[key] = partial(self._load, out_pth)
+            else:
+                for key, file in self.outputs.items():
+                    out_pth = f'{self._out_dir}/{file}'
+                    self._data[key] = partial(self._load, out_pth)
+
+        return inner
 
     def _outputs_present(self):
         """Return False if any outputs are missing."""
