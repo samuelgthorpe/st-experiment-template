@@ -16,7 +16,7 @@ Written by Samuel Thorpe
 # -----------------------------------------------------|
 from logging import getLogger
 import numpy as np
-from st_experiment_template.experiment import Block
+from st_experiment_template.experiment import Block, CheckRunBlock
 logger = getLogger(__name__)
 
 
@@ -39,8 +39,10 @@ class ExampleBlock1(Block):
 
 # # Experiment Block Example Class 2
 # -----------------------------------------------------|
-class ExampleBlock2(Block):
-    """Example experiment block class."""
+class ExampleBlock2(CheckRunBlock):
+    """Example experiment block class demonstrating the CheckRunBlock."""
+
+    outputs = dict(x='x.pkl', y='y.pkl', z='z.pkl')
 
     def run(self):
         """Run main method."""
@@ -48,3 +50,5 @@ class ExampleBlock2(Block):
         self._data['x'] = np.cos(self._data['theta'] - np.pi/2)
         self._data['y'] = np.sin(self._data['theta'] - np.pi/2)
         self._data['z'] = self._data['theta']
+
+        return dict(x=self._data['x'], y=self._data['y'], z=self._data['z'])

@@ -1,6 +1,57 @@
 [build-system]
-requires = [
-    "setuptools>=36",
-    "wheel"
-]
+# Using setuptools as your build backend
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "st-experiment-template"
+version = "0.1.0"
+description = "DS experiment template."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Samuel Thorpe", email = "samuelgthorpe@gmail.com" }
+]
+requires-python = ">=3.9"
+
+dependencies = [
+    "gitpython",
+    "numpy",
+    "scipy",
+    "pandas",
+    "matplotlib",
+    "plotly",
+    "boto3",
+    "psutil",
+    "pyyaml",
+    "nbconvert",
+    # GitHub dependency (public, so no token needed)
+    "sampy @ git+https://github.com/samuelgthorpe/sampy.git@main"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "flake8"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["st_experiment_template*"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --cov=st_experiment_template --cov-report=term-missing --cov-report=html"
+testpaths = [
+    "tests"
+]
+
+[tool.flake8]
+max-line-length = 80
+exclude = [
+    "__pycache__",
+    ".venv",
+    "build",
+    "dist"
+]

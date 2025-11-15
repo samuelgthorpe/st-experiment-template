@@ -1,5 +1,6 @@
 # defines block experiment to run in the configured order
 ExperimentParams:
+  block_rng_seed: True
   report:
     title: Demo Experiment
     tagline: A simple experiment to demonstrate the experiment template
@@ -14,6 +15,7 @@ ExampleBlock1:
 
 ExampleBlock2:
   module: st_experiment_template.experiment.demo.example_block
+  recompute: True
 
 ExampleVisBlock:
   module: st_experiment_template.experiment.demo.example_vis_block
