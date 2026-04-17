@@ -19,12 +19,12 @@ import hashlib
 from functools import partial, lru_cache
 from datetime import datetime
 import dill
+import yaml
 import numpy as np
-from sampy.utils import load_yaml
-from sampy.utils.logger import log_exceptions
-from sampy.utils.aws_s3 import AwsS3
 from st_experiment_template import BASE_DIR
+from st_experiment_template.utils.loggers import log_exceptions
 from st_experiment_template.experiment.report import Report
+from st_experiment_template.utils.aws_s3 import AwsS3
 
 
 # # Globals
@@ -50,7 +50,7 @@ class Experiment:
         """
         logger.info('initializing experiment')
         self.exc = type(f'{self.__class__.__name__}Error', (Exception,), {})
-        self.cfg = load_yaml(cfg_file)
+        self.cfg = yaml.load(open(cfg_file, 'r'), Loader=yaml.SafeLoader)
         self.params = self.cfg.pop('ExperimentParams', {})
         self.src = self._build()
         self.blocks = {}

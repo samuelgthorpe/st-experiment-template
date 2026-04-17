@@ -1,5 +1,4 @@
 [build-system]
-# Using setuptools as your build backend
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
@@ -12,10 +11,11 @@ license = { file = "LICENSE" }
 authors = [
     { name = "Samuel Thorpe", email = "samuelgthorpe@gmail.com" }
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
 dependencies = [
     "gitpython",
+    "dill",
     "numpy",
     "scipy",
     "pandas",
@@ -24,34 +24,36 @@ dependencies = [
     "boto3",
     "psutil",
     "pyyaml",
-    "nbconvert",
-    # GitHub dependency (public, so no token needed)
-    "sampy @ git+https://github.com/samuelgthorpe/sampy.git@main"
+    "requests",
 ]
 
 [project.optional-dependencies]
+dev = [
+    "ipykernel",
+    "jupyter",
+    "nbconvert",
+]
 test = [
     "pytest",
-    "pytest-cov",
-    "flake8"
+    "ruff",
 ]
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["st_experiment_template*"]
 
-[tool.pytest.ini_options]
-minversion = "7.0"
-addopts = "-ra -q --cov=st_experiment_template --cov-report=term-missing --cov-report=html"
-testpaths = [
-    "tests"
+[tool.coverage.run]
+source = ["st_experiment_template"]
+branch = true
+
+[tool.coverage.report]
+omit = [
+  "tests/*",
 ]
 
-[tool.flake8]
-max-line-length = 80
-exclude = [
-    "__pycache__",
-    ".venv",
-    "build",
-    "dist"
-]
+[tool.ruff]
+line-length = 80
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E203"]

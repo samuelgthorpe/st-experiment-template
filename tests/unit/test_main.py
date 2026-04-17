@@ -15,7 +15,7 @@ from os.path import dirname, join
 import unittest
 from st_experiment_template.main import main
 from st_experiment_template.experiment import Experiment
-from st_experiment_template.utils import logger as log_module
+from st_experiment_template.utils import loggers as log_module
 from st_experiment_template.experiment.example_block import \
     ExampleBlock1, ExampleBlock2
 from st_experiment_template.experiment.vis.example_vis_block import \

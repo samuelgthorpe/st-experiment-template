@@ -12,8 +12,8 @@ Written by Samuel Thorpe
 # # Imports
 # -----------------------------------------------------|
 import argparse
-from sampy.utils.logger import init_log
 from st_experiment_template import BASE_DIR
+from st_experiment_template.utils.loggers import init_log
 from st_experiment_template.experiment import Experiment
 
 

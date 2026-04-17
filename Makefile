@@ -33,6 +33,11 @@ docker.run.local:
 		-v ${HOME}/.aws:/root/.aws:ro \
 		${PROJECT_NAME} ${MODULE_NAME}/main.py
 
+# install the jupyter kernel if needed for reporting
+# EXAMPLE USAGE: bootstrap.jupyter
+bootstrap.jupyter:
+	@python tools/bootstrap_jupyter.py
+
 # locally run the primary entry point for testing outside of the container
 # EXAMPLE USAGE: make run.local
 run.local:
