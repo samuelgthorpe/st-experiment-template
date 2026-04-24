@@ -10,6 +10,8 @@ local.db
 **/batch
 **/run
 **/logs
+.artifacts/*
+!.artifacts/.keep
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
