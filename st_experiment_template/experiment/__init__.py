@@ -23,6 +23,7 @@ import yaml
 import numpy as np
 from st_experiment_template import BASE_DIR
 from st_experiment_template.utils.loggers import log_exceptions
+from st_experiment_template.utils.loggers import log_cfg
 from st_experiment_template.experiment.report import Report
 from st_experiment_template.utils.aws_s3 import AwsS3
 
@@ -41,7 +42,7 @@ class Experiment:
     out_dir = os.path.join(BASE_DIR, 'run', 'batch')
 
     @log_exceptions()
-    def __init__(self, cfg_file: str, **kwrgs):
+    def __init__(self, cfg_file, runtime_utc=None, **kwrgs):
         """Initialize class.
 
         Args:
@@ -50,12 +51,20 @@ class Experiment:
         """
         logger.info('initializing experiment')
         self.exc = type(f'{self.__class__.__name__}Error', (Exception,), {})
-        self.cfg = yaml.load(open(cfg_file, 'r'), Loader=yaml.SafeLoader)
+        self.cfg = self._load_save_cfg(cfg_file, runtime_utc)
         self.params = self.cfg.pop('ExperimentParams', {})
         self.src = self._build()
         self.blocks = {}
         self.data = {}
         self.report_items = []
+
+    def _load_save_cfg(self, cfg_file, runtime_utc):
+        """Load config from .yaml file and cache copy to logs."""
+        log_cfg(cfg_file, runtime_utc=runtime_utc)
+        with open(cfg_file, 'r') as fh:
+            cfg = yaml.safe_load(fh)
+
+        return cfg
 
     def _build(self):
         """Build experiment from cfg."""

@@ -1,5 +1,8 @@
 PROJECT_NAME=st-experiment-template
 MODULE_NAME=st_experiment_template
+REPORT_DIR=run/report
+REPORT_PORT=8765
+REPORT_PID := .report_server.pid
 
 # build image locally for testing
 # USAGE: make docker.build.local
@@ -61,3 +64,28 @@ unit.test:
 lint.test:
 	flake8 ${MODULE_NAME}
 	flake8 tests
+
+# setup remote port forwarding for viewing reports on local machine
+# EXAMPLE USAGE: make serve.reports
+serve.reports:
+	@if [ -f $(REPORT_PID) ] && kill -0 $$(cat $(REPORT_PID)) 2>/dev/null; then \
+		echo "Server already running (PID $$(cat $(REPORT_PID)))"; \
+	else \
+		echo "Starting server on port $(REPORT_PORT)..."; \
+		python3 -m http.server $(REPORT_PORT) --bind 127.0.0.1 --directory $(REPORT_DIR) > /dev/null 2>&1 & \
+		echo $$! > $(REPORT_PID); \
+		echo "PID $$(cat $(REPORT_PID))"; \
+	fi
+
+# kill report seeerver when done
+# EXAMPLE USAGE: make stop.reports.server
+stop.reports.server:
+	@if [ -f $(REPORT_PID) ]; then \
+		echo "Stopping server (PID $$(cat $(REPORT_PID)))"; \
+		kill $$(cat $(REPORT_PID)) && rm $(REPORT_PID); \
+	else \
+		echo "No server running"; \
+	fi
+
+snapshot.artifacts:
+	python tools/push_artifact.py

@@ -12,6 +12,7 @@ Written by Samuel Thorpe
 # # Imports
 # -----------------------------------------------------|
 import argparse
+from datetime import datetime, timezone
 from st_experiment_template import BASE_DIR
 from st_experiment_template.utils.loggers import init_log
 from st_experiment_template.experiment import Experiment
@@ -21,8 +22,9 @@ from st_experiment_template.experiment import Experiment
 # -----------------------------------------------------|
 def main(cfg_file, **kwrgs):
     """Run main method."""
-    init_log(BASE_DIR)
-    exp = Experiment(cfg_file, **kwrgs)
+    runtime_utc = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    init_log(BASE_DIR, runtime_utc=runtime_utc)
+    exp = Experiment(cfg_file, runtime_utc=runtime_utc, **kwrgs)
     exp.run()
 
     return exp

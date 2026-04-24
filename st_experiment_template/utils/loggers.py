@@ -17,6 +17,7 @@ import os
 import platform
 import sysconfig
 from os.path import basename
+import shutil
 import logging
 import git
 from importlib.metadata import distributions
@@ -51,8 +52,10 @@ def init_log(base_dir, console_level="INFO", file_level="INFO", **kwrgs):
 
     # setup file handler
     os.makedirs(log_dir, exist_ok=True)
-    dt_utc = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
-    log_file_name = os.path.join(log_dir, f'run-{dt_utc}.log')
+    runtime_utc = kwrgs.get('runtime_utc')
+    if runtime_utc is None:
+        runtime_utc = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    log_file_name = os.path.join(log_dir, f'run-{runtime_utc}.log')
     fh = _get_file_handler(log_file_name, file_level)
     handlers.append(fh)
 
@@ -62,7 +65,7 @@ def init_log(base_dir, console_level="INFO", file_level="INFO", **kwrgs):
         logger.addHandler(handler)
 
     # log header and return
-    _log_header(logger, base_dir, dt_utc)
+    _log_header(logger, base_dir, runtime_utc)
     return logger
 
 
@@ -206,10 +209,13 @@ class JsonFormatter(logging.Formatter):
         return json.dumps(log_message)
 
 
-# # Json Log Reader
+# # Save copy of cfg file to logs
 # -----------------------------------------------------|
-def read_log(log_file):
-    """Read json formatted log file in dataframe."""
-    with open(log_file, 'r') as fh:
-        log_str = f'[{",".join(fh.readlines())}]'
-        return pd.DataFrame(json.loads(log_str))
+def log_cfg(cfg_file, runtime_utc=None):
+    """Cache copy of cfg file to log dir."""
+    log_dir = os.path.join('run', 'logs')
+    os.makedirs(log_dir, exist_ok=True)
+    if runtime_utc is None:
+        runtime_utc = datetime.now().strftime("%Y%m%d-%H%M%S")
+    cfg_log_file = os.path.join(log_dir, f'cfg-{runtime_utc}.yaml')
+    shutil.copy(cfg_file, cfg_log_file)
