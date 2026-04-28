@@ -12,10 +12,12 @@ Written by Samuel Thorpe
 # -----------------------------------------------------|
 import os
 from os.path import basename, dirname, join, splitext
+from logging import getLogger
 import json
 from datetime import datetime
 from subprocess import call
 from st_experiment_template import BASE_DIR
+logger = getLogger(__name__)
 
 
 # # Globals
@@ -38,11 +40,12 @@ img {
 
 # # Main Report Class for Inheritance
 # -----------------------------------------------------|
-class Report():
+class Reporter():
     """Report class."""
 
-    def __init__(self, report_items, **params):
+    def __init__(self, report_items, params):
         """Initialize."""
+        logger.info('initializing reporter')
         self.title = params.get('title', basename(BASE_DIR))
         self.tagline = params.get('tagline', '')
         self.desc = params.get('description', 'insert experiment description.')
@@ -95,6 +98,7 @@ class Report():
 
     def export(self):
         """Write out the report and convert to html."""
+        logger.info('exporting report')
         if self.report_fn is None:
             now = datetime.now().strftime("%Y%m%d-%H%M%S")
             self.report_fn = f'{basename(BASE_DIR)}-{now}'

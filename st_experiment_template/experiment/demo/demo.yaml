@@ -1,15 +1,21 @@
-# defines block experiment to run in the configured order
 ExperimentParams:
   block_rng_seed: True
   report:
-    title: Demo Experiment
-    tagline: A simple experiment to demonstrate the experiment template
-    description: >
-      This is a simple experiment to demonstrate the experiment template.
-      It consists of two example blocks and one example visualization block.
-      The example visualization block generates a simple visualization.
-  push: False
+    enabled: True
+      params:
+      title: Demo Experiment
+      tagline: A simple experiment to demonstrate the experiment template
+      description: >
+        This is a simple experiment to demonstrate the experiment template.
+        It consists of two example blocks and one example visualization block.
+        The example visualization block generates a simple visualization.
+  publish:
+    enabled: False
+    params:
+      bucket: ds-experiment-artifacts
+      prefix: testing/ds-experiment-template/demo
 
+# Remaining fields define block experiment to run in the configured order
 ExampleBlock1:
   module: st_experiment_template.experiment.demo.example_block
 

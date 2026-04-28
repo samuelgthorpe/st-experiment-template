@@ -24,8 +24,8 @@ import numpy as np
 from st_experiment_template import BASE_DIR
 from st_experiment_template.utils.loggers import log_exceptions
 from st_experiment_template.utils.loggers import log_cfg
-from st_experiment_template.experiment.report import Report
-from st_experiment_template.utils.aws_s3 import AwsS3
+from st_experiment_template.experiment.report import Reporter
+from st_experiment_template.experiment.publish import Publisher
 
 
 # # Globals
@@ -67,7 +67,15 @@ class Experiment:
         return cfg
 
     def _build(self):
-        """Build experiment from cfg."""
+        """Build experiment from cfg.
+
+        Note: if publish is configured, validate publish params early.
+        """
+        publish_cfg = self.params.get('publish', {})
+        if publish_cfg.get('enabled') is True:
+            Publisher.validate_publish_params(publish_cfg.get('params', {}))
+
+        # loop over blocks and construct experiment generator
         for block_idx, (cls_name, block_params) in enumerate(self.cfg.items()):
             block_src = importlib.import_module(block_params['module'])
             block_obj = getattr(block_src, cls_name)
@@ -90,6 +98,10 @@ class Experiment:
 
         return int.from_bytes(digest[:4], 'little')
 
+    def fail(self, msg):
+        """Raise custom class exception on failure."""
+        raise self.exc(msg)
+
     # # Run Entry
     # -----------------------------------------------------|
     @log_exceptions()
@@ -101,33 +113,24 @@ class Experiment:
             self.blocks[block_idx].run()
 
         # check configurable experiment params
-        for param in ['report', 'push']:
-            params = self.params.get(param)
-            if params:
-                params = {} if params is True else params
-                getattr(self, f'_{param}')(params)
+        for param in ['report', 'publish']:
+            cfg = self.params.get(param, {})
+            if cfg.get('enabled') is True:
+                getattr(self, f'_{param}')(cfg.get('params', {}))
 
     # # Configurable experiment param helpers
     # -----------------------------------------------------|
     def _report(self, report_params):
         """Create experiment report."""
         logger.info('creating report')
-        report = Report(self.report_items, **report_params)
-        report.export()
+        reporter = Reporter(self.report_items, report_params)
+        reporter.export()
 
-    def _push(self, push_params):
+    def _publish(self, publish_params):
         """Push experiment outputs as configured."""
         logger.info('pushing experiment')
-        _now_ = datetime.now().strftime('%Y%m%d-%H%M%S')
-        cfg_prefix = push_params.get('prefix', '')
-        prefix = join(cfg_prefix, BASE_DIR, f'run-{_now_}')
-
-        s3 = AwsS3()
-        s3.upload_folder_to_s3(
-            local_dir='run',
-            bucket_name=push_params['bucket'],
-            prefix=prefix
-        )
+        publisher = Publisher(publish_params)
+        publisher.publish()
 
 
 # # Experiment Block Base Class
