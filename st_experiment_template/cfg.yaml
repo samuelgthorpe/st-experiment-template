@@ -2,7 +2,7 @@ ExperimentParams:
   block_rng_seed: True
   report:
     enabled: False
-      params:
+    params:
       title: Dev Experiment
       tagline: Working dev experiment from template
       description: >

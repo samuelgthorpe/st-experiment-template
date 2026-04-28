@@ -2,7 +2,7 @@ ExperimentParams:
   block_rng_seed: True
   report:
     enabled: True
-      params:
+    params:
       title: Demo Experiment
       tagline: A simple experiment to demonstrate the experiment template
       description: >
