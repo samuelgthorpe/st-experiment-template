@@ -116,3 +116,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# codex
+.codex
+
+# Latex intermediate files
+docs/report/build/*
+!docs/report/build/*.pdf

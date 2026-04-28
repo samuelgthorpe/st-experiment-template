@@ -3,6 +3,9 @@ MODULE_NAME=st_experiment_template
 REPORT_DIR=run/report
 REPORT_PORT=8765
 REPORT_PID := .report_server.pid
+TEX_REPORT_DIR=docs/report
+TEX_REPORT=RPT-00XXX-Report.tex
+TEX_REPORT_BUILD_DIR=build
 
 # build image locally for testing
 # USAGE: make docker.build.local
@@ -40,6 +43,20 @@ docker.run.local:
 # EXAMPLE USAGE: bootstrap.jupyter
 bootstrap.jupyter:
 	@python tools/bootstrap_jupyter.py
+
+# initialize optional TeX report scaffold under docs/report
+# EXAMPLE USAGE: make init.tex.report
+init.tex.report:
+	@python tools/init_tex_report.py
+
+# compile formal TeX report
+# EXAMPLE USAGE: make compile.tex.report
+compile.tex.report:
+	@mkdir -p $(TEX_REPORT_DIR)/$(TEX_REPORT_BUILD_DIR)
+	@cd $(TEX_REPORT_DIR) && pdflatex -interaction=nonstopmode \
+		-halt-on-error -output-directory $(TEX_REPORT_BUILD_DIR) $(TEX_REPORT)
+	@cd $(TEX_REPORT_DIR) && pdflatex -interaction=nonstopmode \
+		-halt-on-error -output-directory $(TEX_REPORT_BUILD_DIR) $(TEX_REPORT)
 
 # locally run the primary entry point for testing outside of the container
 # EXAMPLE USAGE: make run.local

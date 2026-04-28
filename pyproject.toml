@@ -7,9 +7,8 @@ name = "st-experiment-template"
 version = "0.1.0"
 description = "DS experiment template."
 readme = "README.md"
-license = { file = "LICENSE" }
 authors = [
-    { name = "Samuel Thorpe", email = "samuelgthorpe@gmail.com" }
+    { name = "Samuel Thorpe", email = "sam@neursignal.com" }
 ]
 requires-python = ">=3.10"
 
