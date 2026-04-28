@@ -60,7 +60,7 @@ class ExampleVisBlock(Block):
         )
 
     def _vis_with_plotly(self):
-        """Return plotly visualization."""
+        """Return plotly visualization, embedded for portability."""
         x, y, z = self._data['x'](), self._data['y'](), self._data['z']()
         lines = [
             go.Scatter3d(
@@ -94,9 +94,8 @@ class ExampleVisBlock(Block):
             )
         )
 
-        # add to report
-        vis_fn = os.path.join(self._out_dir, 'example.html')
-        pio.write_html(fig, vis_fn, include_plotlyjs='cdn', full_html=False)
+        # Embed plotly HTML directly in the report for portability
+        html_str = pio.to_html(fig, include_plotlyjs='cdn', full_html=False)
         self._report_items.append(
-            report_img_code(vis_fn, hdr='3D Stem Plot', desc=self.desc)
+            report_code_html(html_str, hdr='3D Stem Plot', desc=self.desc)
         )

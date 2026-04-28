@@ -169,16 +169,8 @@ def report_img_code(pths, hdr='Figure', desc='insert description', **params):
 
     # loop construct content
     for pth in pths:
-        if splitext(pth)[-1] == '.html':
-            content = ["from IPython.display import IFrame, display"]
-            width = params.get('width', '100%')
-            height = params.get('height', 600)
-            content.append(
-                f'display(IFrame("{pth}", width="{width}", height={height}))'
-            )
-        else:
-            content = ["from IPython.display import Image, display"]
-            content.append(f'display(Image("{pth}"))')
+        content = ["from IPython.display import Image, display"]
+        content.append(f'display(Image("{pth}"))')
     content = "\n".join(content)
 
     return report_item(hdr, desc, content, meta=meta, type='code')
@@ -186,10 +178,9 @@ def report_img_code(pths, hdr='Figure', desc='insert description', **params):
 
 def report_code_html(html_str, hdr='Figure', desc='insert description'):
     """Structure html figure as report item."""
-    content = f"""
-    from IPython.display import display, HTML
-    html_str = '''{html_str}'''
-
-    display(HTML(html_str))
-    """
+    content = (
+        "from IPython.display import display, HTML\n"
+        f"html_str = '''{html_str}'''\n"
+        "display(HTML(html_str))"
+    )
     return report_item(hdr, desc, content, type='code')
