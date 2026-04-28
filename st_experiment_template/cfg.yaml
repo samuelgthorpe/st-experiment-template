@@ -1,4 +1,18 @@
-# defines block experiment to run in the configured order
+ExperimentParams:
+  block_rng_seed: True
+  report:
+    enabled: False
+      params:
+      title: Dev Experiment
+      tagline: Working dev experiment from template
+      description: >
+        Insert experiment details here once built.
+  publish:
+    enabled: False
+    params:
+      bucket: ds-experiment-artifacts
+      prefix: testing/ds-experiment-template/dev
 
+# Remaining fields define block experiment to run in the configured order
 DevBlock:
   module: st_experiment_template.experiment.dev_block

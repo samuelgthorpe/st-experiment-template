@@ -123,3 +123,4 @@ dmypy.json
 # Latex intermediate files
 docs/report/build/*
 !docs/report/build/*.pdf
+!docs/report/build/.keep
