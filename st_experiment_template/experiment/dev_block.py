@@ -11,21 +11,19 @@ Written by Samuel Thorpe
 # # Imports
 # -----------------------------------------------------|
 from logging import getLogger
-from st_experiment_template.experiment import Block
+from st_experiment_template.experiment import CheckRunBlock
 logger = getLogger(__name__)
 
 
 # # Experiment Block Example Class 1
 # -----------------------------------------------------|
-class DevBlock(Block):
+class DevBlock(CheckRunBlock):
     """Experiment block class."""
 
-    def __init__(self, **params):
-        """Instantiate class.
+    outputs = dict()
 
-        Args:
-            **params: Dict of params set in config
-        """
+    def __init__(self, **params):
+        """Instantiate class with params from config."""
         super().__init__(**params)
 
     def run(self):
